@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	
+	<flow name="implementationFlow" doc:id="0ecd4c39-7054-4d7a-8c09-eee456e9336e" >
+		<logger level="INFO" doc:name="Logger" doc:id="367b8f57-1ce5-4aa9-a736-c781b73deb77" />
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="8c8f59c0-d592-48cc-9340-84d471a9a2c4" >
+			<http:request doc:name="Request process" doc:id="f7f74e4c-310d-4558-a5a7-65dc1c4d3b9f" config-ref="HTTP_Request_config" url="${salesforce.url}" method="POST"/>
+		</until-successful>
+		<error-handler ref="globalErrorHandler" />
+	</flow>
+</mule>

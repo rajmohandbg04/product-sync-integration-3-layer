@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="product-process-sync-integrationFlow" doc:id="1b13350d-3a70-4e81-81f3-47167b6861d0" >
+		<http:listener doc:name="Listener" doc:id="7156e8ad-b237-4ab9-ba67-c839185059ed" config-ref="HTTP_Listener_config1" path="${http.basePath}" allowedMethods="POST"/>
+		<logger level="INFO" doc:name="Logger" doc:id="80839f96-b102-4eed-bdd2-5f6975ccefaa" />
+		<flow-ref doc:name="Flow Reference" doc:id="932d8eda-738f-492a-8748-8c79cb44b4f3" name="product-fetch-subflowSub_Flow"/>
+		<ee:transform doc:name="Transform Message" doc:id="1be7c78a-3edb-44a4-8974-477f172518ab" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[output application/json
+---
+{
+            message: "Product sync triggered successfully",
+            totalFetched: vars.totalFetched,
+            sentToMQ: vars.sentToMq,
+            timestamp: now()
+        }]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

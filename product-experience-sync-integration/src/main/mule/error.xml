@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	
+	<error-handler name="globalErrorHandler">
+
+
+    <!-- 5️⃣ 405 Method Not Allowed -->
+    <on-error-propagate type="HTTP:METHOD_NOT_ALLOWED">
+
+        <set-variable variableName="httpStatus" value="405"/>
+
+        <ee:transform doc:name="Method Not Allowed Error">
+            <ee:message>
+                <ee:set-payload><![CDATA[
+%dw 2.0
+output application/json
+---
+{
+  status: 405,
+  error: "Method Not Allowed",
+  message: "Only POST method is allowed",
+  allowedMethod: "POST",
+  time: now()
+}
+                ]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+
+    </on-error-propagate>
+
+</error-handler>
+	
+	</mule>

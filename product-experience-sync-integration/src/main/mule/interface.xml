@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	
+	<flow name="product-experience-sync-integrationFlow" doc:id="18ce2b42-472d-4222-ae9b-f29454e23882" >
+		<http:listener doc:name="Listener" doc:id="ef2ef308-c714-44ab-82cc-f7e2e3cb6e55" path="${http.basePath}" config-ref="HTTP_Listener_config" allowedMethods="POST">
+			<http:error-response >
+				<http:body ><![CDATA[#[payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<flow-ref doc:name="Flow Reference" doc:id="fb5fb1ef-fac4-4e18-81d6-beb24ceb5334" name="implementationFlow"/>
+		<error-handler ref="globalErrorHandler" />
+	</flow>
+</mule>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	
+	
+	
+	<flow name="implementationFlow" doc:id="de2db220-b3e0-41ee-930b-6f3ff7cbc83f" >
+		<scheduler doc:name="Scheduler" doc:id="715c466c-b5a1-4e36-83cd-61f687443f79" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="30" timeUnit="MINUTES"/>
+			</scheduling-strategy>
+		</scheduler>
+		<logger level="INFO" doc:name="Logger" doc:id="af08b963-a224-4531-b197-a07476ccf261" />
+		<flow-ref doc:name="Flow Reference" doc:id="a01a9688-4d06-4b57-9838-8b2c2f5ecfab" name="product-fetch-subflowSub_Flow"/>
+		<ee:transform doc:name="Transform Message" doc:id="b2796083-ebba-416b-a1f2-6b5a09bada73" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	sucess: "sucessfuly upsert"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="implementationFlow1" doc:id="37353585-1ff2-4382-a078-c54d6305a999" >
+		<vm:listener queueName="product.sync.queue" doc:name="Listener" doc:id="dcc85306-70a4-4b0a-91ad-ff245d9ecf33" config-ref="VM_Config"/>
+		<logger level="INFO" doc:name="Logger" doc:id="3a8972da-5a35-4ead-9bcc-f40218f08360" />
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="74e24067-763f-46e6-9f84-e58c6a6c2f98" >
+			<http:request doc:name="Request" doc:id="15e5ecb1-c9c0-45e1-88e0-a557bf796799" config-ref="HTTP_Request_config" method="POST" url="${salesforce.url}" />
+		</until-successful>
+	</flow>
+	<sub-flow name="product-fetch-subflowSub_Flow" doc:id="034fafab-4821-4299-ad29-8fa536106cad" >
+		<logger level="INFO" doc:name="Logger" doc:id="e976ad6c-5fa7-4979-ae68-3159fc9a65a7" message="#[payload]" />
+	<!-- 	<http:request doc:name="Request" doc:id="6d4fdbfd-d5d0-4626-9bd9-99325cb40b17" config-ref="HTTP_Request_config12" url="${secure::UrlSetting.url}"/> -->
+	
+		<try doc:name="Try" doc:id="68dcedc6-6d32-4a5a-8ee1-987a55e62700" >
+			<until-successful maxRetries="5" doc:name="Until Successful" doc:id="56b5ab49-f39d-40c9-aead-6fc54b4d4547">
+			<http:request config-ref="HTTP_Request_config12" url="${secure::UrlSetting.url}">
+    
+</http:request>
+		</until-successful>
+			<error-handler ref="globalErrorHandler" />
+		</try>
+		<set-variable value="#[sizeOf(payload)]" doc:name="Set Variable" doc:id="b27122ff-3624-48b2-9042-c03d25155cd0" variableName="totalFetched"/>
+		<set-variable value="0" doc:name="Set Variable" doc:id="f2405242-6fd8-4315-93c2-ba1496bdcaf9" variableName="sentToMq"/>
+		<foreach doc:name="For Each" doc:id="382257fa-e8e7-45c5-95b9-375aa00fbb21" collection="#[payload]">
+			<choice doc:name="Choice" doc:id="4295631b-f4dd-497d-b738-fc774641dc46" >
+				<when expression='payload.price &gt; 100'>
+					<set-variable value='Premium' doc:name="Set Variable" doc:id="21c8097c-5613-408c-afcb-56a095ab1684" variableName="productType"/>
+				</when>
+				<otherwise>
+					<set-variable value='Standard' doc:name="Set Variable" doc:id="c90f0ef9-bfde-442c-bd79-d30b13532798" variableName="productType"/>
+				</otherwise>
+			</choice>
+			<ee:transform doc:name="Transform Message" doc:id="09c55c8c-8985-4266-8f2f-b5b1d6ea69a7" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  id: payload.id,
+  title: payload.title,
+  price: payload.price,
+  category: payload.category,
+  description: payload.description,
+  image: payload.image,
+  productType: vars.productType
+}
+]]></ee:set-payload>
+				</ee:message>
+				<ee:variables />
+			
+</ee:transform>
+<set-variable
+        variableName="sentToMq"
+        value="#[vars.sentToMq + 1]"/>
+			<vm:publish doc:name="Publish" doc:id="5b2ed045-993c-4b52-a0ed-36686a73de4a" config-ref="VM_Config" queueName="product.sync.queue"/>
+			<logger level="INFO" doc:name="Logger" doc:id="a55bc7e5-a438-4560-91f2-069861c341b0" message="#[payload]"/>
+		</foreach>
+	</sub-flow>
+</mule>

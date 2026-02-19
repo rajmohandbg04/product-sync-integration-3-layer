@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+xmlns:http="http://www.mulesoft.org/schema/mule/http"
+xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+xmlns="http://www.mulesoft.org/schema/mule/core"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+	<configuration-properties doc:name="Configuration properties" doc:id="2bc31389-ce6f-4c55-9ae6-155a3805d4c6" file="Properties/${mule.env}.yaml" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="0d2e3961-a423-4555-bc57-74e8260825b7" file="Properties/${mule.env}.yaml" key="${secure.key}" />
+	<http:listener-config name="HTTP_Listener_config1" doc:name="HTTP Listener config1" doc:id="587f5993-a928-4e0e-b17e-aab5ce4778fc" >
+		<http:listener-connection host="0.0.0.0" port="${http.port}" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_config" doc:name="HTTP Request config" doc:id="9cc2365a-7154-44a6-8716-c591074034ed" >
+		<http:request-connection host="${salesforce.host}" protocol="HTTPS"/>
+	</http:request-config>
+	<http:request-config name="HTTP_Request_config12" doc:name="HTTP Request config" doc:id="3cd00bad-8942-4c55-87e0-cf8e78d9d359" >
+		<http:request-connection host="${secure::UrlSetting.host}" protocol="HTTPS"/>
+	</http:request-config>
+	<vm:config name="VM_Config" doc:name="VM Config" doc:id="6b6da6f6-b77b-452b-893e-b267aca2e2fc" >
+		<vm:queues >
+			<vm:queue queueName="product.sync.queue" />
+			<vm:queue queueName="product.sync.dlq" />
+		</vm:queues>
+	</vm:config>
+	<configuration doc:name="Configuration" doc:id="9927c6ba-bc96-4997-a267-5260d04a864e" defaultErrorHandler-ref="globalErrorHandler" />
+</mule>
