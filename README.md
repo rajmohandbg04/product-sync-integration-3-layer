@@ -1,7 +1,6 @@
 # product-sync-integration-3-layer
 Product Sync &amp; Notification Integration is a MuleSoft application that fetches product data from a public API, applies business rules using Choice and DataWeave, publishes messages to Anypoint MQ, processes them asynchronously, upserts records into Salesforce, runs on a scheduler, and includes retry and error handling for reliability.
 
-Product Sync & Notification Integration is a MuleSoft application that fetches product data from a public API, applies business rules using Choice and DataWeave, publishes messages to a VM queue for asynchronous processing, upserts records into Salesforce, runs on a scheduler, and includes retry and error handling mechanisms for reliability.
 This project follows a 3-Layer Architecture:
 
 1️⃣ Experience Layer</br>
