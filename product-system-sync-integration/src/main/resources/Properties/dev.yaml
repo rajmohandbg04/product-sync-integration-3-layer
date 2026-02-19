@@ -1,0 +1,14 @@
+http:
+  port: "8081"
+  basePath: "/system/salesforce"
+
+
+
+salesforce:
+  username: "![oc5UD7aroniQK1WOkXm8fjTQv/8k0o7Wu7AMmSL/SuU=]"
+  consumerKey: "![nE0KJW5G7csRXbSuuSBXTvGMgVSoOZWgwiXBHsbIFoX/ksMe6UfzL/WYVX6tqvrjBy7N33WSenJJ9pHRhju6aTMlTSwCW+3GqxRnVamxB2Uv0LzGTJ9493g43gP/g46p]"
+  consumerSecret: "![ArWOEs7Eh06bNhjyJAL9WnjtAMewlJmXCLDIq6WD6Do2vra76lRXAUFvW/s1OycmaDmPYCCNZ3g9S9NFFdExq584ZnjMXFVVLjxjaEZ7OJg=]"
+  password: "![BO/k+Aj6Yt7imMOh9LU9nQ==]"
+  token: "![ZLZf2Gw8FDjFzkr8xH3auiBWdottWmuj1NnXxlQ4Qfw=]"
+  tokenEndPoint: "![nwS2f56ys+2HeJ0C7X2ZLNHA5ft1R9A3sMqLOl6Jp0DjNx2jWZ0ndupwbx63LeZJ35IfIaDQURc9AXJYlGXI3w==]"
+  

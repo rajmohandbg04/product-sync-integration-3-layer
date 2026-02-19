@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="interfaceFlow" doc:id="4079b611-5241-4e4c-8963-abe500fff37e" >
+	<http:listener doc:name="Listener" doc:id="6c033a89-4586-4a82-b2e6-c877591f35d6" config-ref="HTTP_Listener_config" path="${http.basePath}" allowedMethods="POST"/>
+		<logger level="INFO" doc:name="Logger" doc:id="9c3622a0-c609-48b7-9248-73dcf3bbffec" />
+		<flow-ref doc:name="Flow Reference" doc:id="229456c7-f431-4cfb-ba99-619ad83d7412" name="product-system-sync-integrationFlow"/>
+	</flow>
+	<flow name="interfaceFlow1" doc:id="98c48a26-ff5d-4476-ba2d-b95a2afc0f34" >
+		<vm:listener doc:name="Listener" doc:id="d1e9b87e-09b7-4419-b11f-3ba418c8519a" config-ref="VM_Config" queueName="product.sync.dlq"/>
+		<ee:transform doc:name="Transform Message" doc:id="c249f27f-7012-4c64-97a3-5d4ab3b08221" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+    status: "FAILED",
+    errorType: error.errorType.identifier,
+    description: error.description
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	
+
+	<error-handler name="error-handlerError_Handler">
+	
+
+		<!-- Existing Handler (NOT changed) -->
+		 <on-error-propagate type="SALESFORCE:CONNECTIVITY"
+                                logException="true"
+                                doc:name="Salesforce Down">
+
+                <logger level="ERROR"
+                        message="Salesforce Down After 3 Retries: #[error.description]" />
+			<vm:publish queueName="product.sync.dlq" doc:name="Publish" doc:id="d728a8b0-83b9-4527-ba12-88f108ed9a87" config-ref="VM_Config"/>
+
+		
+			
+		   
+</on-error-propagate>
+		<on-error-propagate type="ANY"
+			enableNotifications="true"
+			logException="true"
+			doc:name="On Error Propagate">
+
+			<logger level="ERROR"
+				message="Unhandled Error: #[error.description]" />
+
+			<!-- Transform Error Response -->
+			<ee:transform doc:name="Error Response Transform">
+				<ee:message>
+					<ee:set-payload>
+						<![CDATA[
+%dw 2.0
+output application/json
+---
+{
+    status: "FAILED",
+    errorType: error.errorType.identifier,
+    description: error.description
+}
+						]]>
+					</ee:set-payload>
+				</ee:message>
+			</ee:transform>
+
+		</on-error-propagate>
+		
+		
+	</error-handler>
+	
+	
+	</mule>

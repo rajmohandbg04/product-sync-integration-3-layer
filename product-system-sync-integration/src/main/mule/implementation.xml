@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule  xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+xmlns:http="http://www.mulesoft.org/schema/mule/http"
+xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+xmlns="http://www.mulesoft.org/schema/mule/core"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+	
+	<flow name="product-system-sync-integrationFlow" doc:id="119078a6-0e5b-4ac3-b92a-3c2a8f4ea915" >
+		
+		<logger level="INFO" doc:name="Logger" doc:id="53debc3f-64f1-4635-b740-e094986ddacd" message="#[payload]"/>
+		
+		<ee:transform doc:name="Transform Message" doc:id="0cbc4f66-95dc-4d1f-bf0a-3d6f0c2fc5d9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import substring from dw::core::Strings
+output application/java
+---
+[
+  {
+    External_Id__c: payload.id as String,
+    Name: substring(payload.title, 0, 80),
+    Category__c: 
+        if (payload.category == "electronics") 
+           "Electronics" 
+        else 
+           "Other",
+    Price__c: payload.price,
+    Description__c: payload.description,
+    Image_URL__c: payload.image,
+    Is_Active__c: payload.price >= 20
+  }
+]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<try doc:name="Try" doc:id="96534683-8ad9-4546-9952-552115ef0260" >
+			<until-successful maxRetries="5" doc:name="Until Successful" doc:id="31044b64-7ca0-4678-a3b4-8dedc1d13683" >
+				<salesforce:upsert doc:name="Upsert" doc:id="88654b75-08bf-4698-ac4c-977cf4394781" config-ref="Salesforce_Config1" objectType="External_Product__c" externalIdFieldName="External_Id__c"/>
+			</until-successful>
+			<error-handler ref="error-handlerError_Handler" />
+		</try>
+		<logger level="INFO" doc:name="Logger" doc:id="ffb64500-a6d8-4497-81b8-f6c6c35e4f97" message="suscesss inssert"/>
+	</flow>
+
+</mule>

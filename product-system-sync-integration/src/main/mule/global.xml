@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	 xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+    xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+    xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+        http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<configuration-properties doc:name="Configuration properties" doc:id="f13a57c3-6d1c-434f-84f7-4152483d24da" file="Properties/${mule.env}.yaml" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="3a0d1e3b-ed38-40af-906d-f4e6e83284e2" file="Properties/${mule.env}.yaml" key="${secure.key}" />
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="c21f3c26-5a6d-4fd4-9fdd-522bdd104e7a" >
+		<http:listener-connection host="0.0.0.0" port="${http.port}" />
+	</http:listener-config>
+	<salesforce:sfdc-config name="Salesforce_Config1" doc:name="Salesforce Config" doc:id="504cb1b5-eaab-4aed-a8ec-ead682a529c9" >
+		<salesforce:oauth-user-pass-connection consumerKey="${secure::salesforce.consumerKey}" consumerSecret="${secure::salesforce.consumerSecret}" username="${secure::salesforce.username}" password="${secure::salesforce.password}" securityToken="${secure::salesforce.token}" tokenEndpoint="${secure::salesforce.tokenEndPoint}" />
+	</salesforce:sfdc-config>
+		<vm:config name="VM_Config" doc:name="VM Config" doc:id="b206d76b-b943-41b9-a687-ecbccd18a439" >
+		<vm:queues >
+			<vm:queue queueName="product.sync.dlq" />
+		</vm:queues>
+	</vm:config>
+	<configuration doc:name="Configuration" doc:id="f0dbbebc-b4c3-4d89-a8b4-11c4faa28b29" defaultErrorHandler-ref="error-handlerError_Handler" />
+	
+</mule>
